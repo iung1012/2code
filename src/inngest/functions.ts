@@ -1,14 +1,19 @@
 import { inngest } from "./client";
+import { openai, createAgent } from "@inngest/agent-kit";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
   { event: "test/hello.world" },
   async ({ event, step }) => {
-    // dummy process 1 (script planning)
-    await step.sleep("wait-a-moment", "10s");
+    const writer = createAgent({
+      name: "writer",
+      system: "You are an expert writer.  You write readable, concise, simple content.",
+      model: openai({ model: "meta-llama/llama-4-scout-17b-16e-instruct", baseUrl: "https://api.groq.com/openai/v1" }),
+    });
 
-    // dummy process 2 (voiceover writing)
-    await step.sleep("wait-a-moment", "10s");
-    return { message: `Hello ${event.data.mail}!` };
+    const { output } = await writer.run(`Write a short story about this ${event.data.value}`)
+
+    await step.sleep("wait-a-moment", "2s");
+    return { message: output };
   },
 );
