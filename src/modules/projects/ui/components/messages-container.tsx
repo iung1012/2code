@@ -21,11 +21,11 @@ export default function MessagesContainer({ projectId }: { projectId: string }) 
         if (lastAssistantMessage) {
             // TODO: SET ACTIVE FRAGMENT
         }
-    }, []);
+    }, [messages]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView();
-    }, [])
+    }, [messages])
 
     return (
         <div className="flex flex-col flex-1 min-h-0">
