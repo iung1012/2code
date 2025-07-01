@@ -21,10 +21,7 @@ export default function MessagesContainer({
     const trpc = useTRPC();
     const { data: messages } = useSuspenseQuery(trpc.messages.getMany.queryOptions({
         projectId: projectId
-    }, {
-        // TODO: THIS ACTUALLY REFETCHES EVERYTIME, FIX LATER
-        refetchInterval: 5000,
-    })); 
+    }));
 
     useEffect(() => {
         const lastAssistantMessageWithFragment = messages.findLast(
