@@ -42,9 +42,11 @@ const FragmentCard = ({
     onFragmentClick
 }: FragmentCardProps) => {
     return (
-        <button className={cn(
-            "flex items-start text-start gap-2 border rounded-lg bg-muted w-fit p-3 hover:bg-secondary transition-colors cursor-pointer",
-            isActiveFragment && "bg-primary text-primary-foreground border-primary hover:bg-primary"
+        <button 
+            onClick={() => onFragmentClick(fragment)}
+            className={cn(
+                "flex items-start text-start gap-2 border rounded-lg bg-muted w-fit p-3 hover:bg-secondary transition-colors cursor-pointer",
+                isActiveFragment && "bg-primary text-primary-foreground border-primary hover:bg-primary"
         )}>
             <Code2Icon className="size-4 mt-0.5" />
             <div className="flex flex-col flex-1">
@@ -94,7 +96,7 @@ const AssistantMessage = ({
                     <FragmentCard
                         fragment={fragment}
                         isActiveFragment={isActiveFragment}
-                        onFragmentClick={() => { }}
+                        onFragmentClick={onFragmentClick}
                     />
                 )}
             </div>
@@ -122,7 +124,7 @@ export default function MessageCard({
                 fragment={fragment}
                 createdAt={createdAt}
                 isActiveFragment={isActiveFragment}
-                onFragmentClick={() => { }}
+                onFragmentClick={onFragmentClick}
                 type={type}
             />
         )
