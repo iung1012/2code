@@ -18,27 +18,32 @@ export default function MessagesContainer({
     setActiveFragment: (fragment: Fragment | null) => void
  }) {
     const bottomRef = useRef<HTMLDivElement>(null);
+    const lastAssistantMessageIdRef = useRef<string | null>(null);
     const trpc = useTRPC();
     const { data: messages } = useSuspenseQuery(trpc.messages.getMany.queryOptions({
         projectId: projectId
+    }, {
+        // CONSIDER USING POLLING (?)
+        refetchInterval: 5000, 
     }));
 
     useEffect(() => {
-        const lastAssistantMessageWithFragment = messages.findLast(
-            (message) => message.role === "ASSISTANT" && !!message.fragment
-        );
+        const lastAssistantMessage = messages.findLast(
+            (message) => message.role === "ASSISTANT"
+        ); 
 
-        if (lastAssistantMessageWithFragment) {
-            setActiveFragment(lastAssistantMessageWithFragment.fragment); 
+        if (
+            lastAssistantMessage?.fragment &&
+            lastAssistantMessage.id != lastAssistantMessageIdRef.current
+        ) {
+            setActiveFragment(lastAssistantMessage.fragment); 
+            lastAssistantMessageIdRef.current = lastAssistantMessage.id;
+            bottomRef.current?.scrollIntoView();
         }
     }, [messages, setActiveFragment]);
 
     const lastMessage = messages[messages.length - 1 ]; 
     const isLastMessageUser = lastMessage?.role === "USER";
-
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView();
-    }, [messages])
 
     return (
         <div className="flex flex-col flex-1 min-h-0">
