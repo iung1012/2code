@@ -15,7 +15,6 @@ export function convertFilesToTreeItems(
 ): TreeItem[] {
   const tree: TreeNode = {}; 
   const sortedPaths = Object.keys(files).sort();
-  let current = tree;
 
   for (const filePath of sortedPaths) {
     const parts = filePath.split("/"); 
