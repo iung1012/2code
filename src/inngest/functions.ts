@@ -7,7 +7,7 @@ import { PROMPT } from "@/prompt";
 import { prisma } from "@/lib/db";
 
 interface AgentState {
-  summary: string, 
+  summary: string,
   files: { [path: string]: string }
 }
 
@@ -16,7 +16,7 @@ export const codeAgentFunction = inngest.createFunction(
   { event: "code-agent/run" },
   async ({ event, step }) => {
     const sandboxId = await step.run("get-sandbox-id", async () => {
-      const sandbox = await Sandbox.create("neo-test-1"); 
+      const sandbox = await Sandbox.create("neo-test-1");
       return sandbox.sandboxId;
     })
 
@@ -24,9 +24,9 @@ export const codeAgentFunction = inngest.createFunction(
       name: "code-agent",
       description: "an expert AI coding agent",
       system: PROMPT,
-      model: openai({ 
-        model: "gemini-2.5-flash", 
-        baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai/", 
+      model: openai({
+        model: "gemini-2.5-flash",
+        baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai/",
         defaultParameters: {
           temperature: 0.1
         }
@@ -34,23 +34,23 @@ export const codeAgentFunction = inngest.createFunction(
       tools: [
         // run terminal tool
         createTool({
-          name: "terminal", 
-          description: "Use the terminal to run commands", 
+          name: "terminal",
+          description: "Use the terminal to run commands",
           parameters: z.object({
             command: z.string(),
-          }), 
+          }),
           handler: async ({ command }, { step }) => {
             return await step?.run("terminal", async () => {
-              const buffers = { stdout: "", stderr: ""}
+              const buffers = { stdout: "", stderr: "" }
 
               try {
                 const sandbox = await getSandbox(sandboxId);
                 const result = await sandbox.commands.run(command, {
                   onStdout: (data: string) => {
                     buffers.stdout += data;
-                  }, 
+                  },
                   onStderr: (data: string) => {
-                    buffers.stderr +=  data;
+                    buffers.stderr += data;
                   }
                 });
                 return result.stdout;
@@ -59,51 +59,51 @@ export const codeAgentFunction = inngest.createFunction(
               }
             });
           }
-        }), 
+        }),
         // tool for creates files
         createTool({
-          name: "createOrUpdateFiles", 
-          description: "create of update files in the sandbox", 
+          name: "createOrUpdateFiles",
+          description: "create of update files in the sandbox",
           parameters: z.object({
             files: z.array(
               z.object({
-                path: z.string(), 
+                path: z.string(),
                 content: z.string()
               }),
             ),
-          }), 
+          }),
           handler: async ({ files }, { step, network }: Tool.Options<AgentState>) => {
             const newFiles = await step?.run("createOrUpdateFiles", async () => {
               try {
-                const updatedFiles = network.state.data.files || {}; 
-                const sandbox = await getSandbox(sandboxId); 
+                const updatedFiles = network.state.data.files || {};
+                const sandbox = await getSandbox(sandboxId);
                 for (const file of files) {
-                  await sandbox.files.write(file.path, file.content); 
+                  await sandbox.files.write(file.path, file.content);
                   updatedFiles[file.path] = file.content;
                 }
 
                 return updatedFiles;
-              } catch (e) { 
+              } catch (e) {
                 return "Error: " + e;
               }
-            }); 
-            
+            });
+
             if (typeof newFiles === "object") {
               network.state.data.files = newFiles;
             }
-          }, 
-        }), 
+          },
+        }),
         // read files tool 
-        createTool({ 
-          name: "readFiles", 
-          description: "Read all files and store it in a json object", 
+        createTool({
+          name: "readFiles",
+          description: "Read all files and store it in a json object",
           handler: async ({ files }, { step }) => {
             return await step?.run("readFiles", async () => {
               try {
-                const sandbox = await getSandbox(sandboxId); 
-                const contents = []; 
+                const sandbox = await getSandbox(sandboxId);
+                const contents = [];
                 for (const file of files) {
-                  const content = await sandbox.files.read(file); 
+                  const content = await sandbox.files.read(file);
                   contents.push({ path: file, content });
                 }
 
@@ -131,25 +131,25 @@ export const codeAgentFunction = inngest.createFunction(
     });
 
     const network = createNetwork<AgentState>({
-      name: "code-agent-network", 
-      agents: [codeAgent], 
-      maxIter: 15, 
+      name: "code-agent-network",
+      agents: [codeAgent],
+      maxIter: 15,
       router: async ({ network }) => {
-        const summary = network.state.data.summary; 
+        const summary = network.state.data.summary;
 
-        if (summary) return; 
+        if (summary) return;
         return codeAgent;
       }
     })
 
     const result = await network.run(event.data.value);
 
-    const isError = 
-      !result.state.data.summary || 
+    const isError =
+      !result.state.data.summary ||
       Object.keys(result.state.data.files || {}).length === 0;
 
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
-      const sandbox = await getSandbox(sandboxId); 
+      const sandbox = await getSandbox(sandboxId);
       const host = sandbox.getHost(3000);
       return `https://${host}`;
     })
@@ -159,8 +159,8 @@ export const codeAgentFunction = inngest.createFunction(
         return await prisma.message.create({
           data: {
             projectId: event.data.projectId,
-            content: "Something went wrong. Please try again", 
-            role: "ASSISTANT", 
+            content: "Something went wrong. Please try again",
+            role: "ASSISTANT",
             type: "ERROR"
           }
         })
@@ -169,13 +169,13 @@ export const codeAgentFunction = inngest.createFunction(
       return await prisma.message.create({
         data: {
           projectId: event.data.projectId,
-          content: result.state.data.summary, 
-          role: "ASSISTANT", 
-          type: "RESULT", 
+          content: result.state.data.summary,
+          role: "ASSISTANT",
+          type: "RESULT",
           fragment: {
             create: {
-              sandboxUrl: sandboxUrl, 
-              title: "Fragment", 
+              sandboxUrl: sandboxUrl,
+              title: "Fragment",
               files: result.state.data.files,
             }
           }
@@ -184,9 +184,9 @@ export const codeAgentFunction = inngest.createFunction(
     })
 
     return {
-      url: sandboxUrl, 
-      title: "Fragment", 
-      files: result.state.data.files, 
+      url: sandboxUrl,
+      title: "Fragment",
+      files: result.state.data.files,
       summary: result.state.data.summary
     }
   },
