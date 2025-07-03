@@ -10,11 +10,14 @@ import TextareaAutoSize from 'react-textarea-autosize';
 import { Button } from "@/components/ui/button";
 import { ArrowUpIcon, Loader2Icon } from "lucide-react";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import Usage from "./usage";
+import { useRouter } from "next/navigation";
 
 interface Props {
-    projectId: string
+    projectId: string, 
+    isLoadingProcess: boolean,
 }
 
 const formSchema = z.object({
@@ -23,18 +26,30 @@ const formSchema = z.object({
         .max(10000, { message: "Value is too long" })
 });
 
-export default function MessageForm({ projectId }: Props) {
+export default function MessageForm({ projectId, isLoadingProcess }: Props) {
+    const router = useRouter();
     const trpc = useTRPC();
     const queryClient = useQueryClient();
+
+    const { data: usage } = useQuery(trpc.usage.status.queryOptions());
+
     const createMessage = useMutation(trpc.messages.create.mutationOptions({
         onSuccess: (data) => {
             form.reset(); 
             queryClient.invalidateQueries(
                 trpc.messages.getMany.queryOptions({ projectId: data.projectId })
             );
+            // invalidate queries after created a message
+            queryClient.invalidateQueries(
+                trpc.usage.status.queryOptions()
+            )
         },
         onError: (error) => {
             toast.error(error.message);
+
+            if (error.data?.code === "TOO_MANY_REQUESTS") {
+                router.push("/pricing");
+            }
         }
     }));
 
@@ -53,12 +68,17 @@ export default function MessageForm({ projectId }: Props) {
     };
 
     const [isFocused, setIsFocused] = useState(false);
-    const isPending = createMessage.isPending;
-    const isButtonDisabled = isPending || !form.formState.isValid; 
-    const showUsage = false;
+    const isButtonDisabled = isLoadingProcess || !form.formState.isValid; 
+    const showUsage = !!usage;
 
     return (
         <Form {...form}>
+            {showUsage && (
+                <Usage 
+                    points={usage.remainingPoints}
+                    msBeforeNext={usage.msBeforeNext}
+                />
+            )}
             <form 
                 onSubmit={form.handleSubmit(onSubmit)}
                 className={cn(
@@ -73,7 +93,7 @@ export default function MessageForm({ projectId }: Props) {
                     render={({field}) => (
                         <TextareaAutoSize 
                             {...field}
-                            disabled={isPending}
+                            disabled={isLoadingProcess}
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
                             minRows={2}
@@ -103,7 +123,7 @@ export default function MessageForm({ projectId }: Props) {
                         isButtonDisabled && "bg-muted-foreground border"
                     )}
                 >
-                    {isPending ? (
+                    {isLoadingProcess ? (
                         <Loader2Icon className="size-4 animate-spin" />
                     ) : (
                        <ArrowUpIcon /> 

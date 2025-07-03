@@ -4,27 +4,28 @@ import { protectedProcedure, createTRPCRouter } from "@/trpc/init";
 import { z } from "zod";
 import { generateSlug } from "random-word-slugs";
 import { TRPCError } from "@trpc/server";
+import { consumeCredits } from "@/lib/usage";
 
 export const projectsRouter = createTRPCRouter({
     getOne: protectedProcedure
         .input(
             z.object({
-                id: z.string().min(1, { message: "project id is required "})
-            })     
+                id: z.string().min(1, { message: "project id is required " })
+            })
         )
         .query(async ({ input, ctx }) => {
             const existingProject = await prisma.project.findUnique({
                 where: {
-                    id: input.id, 
+                    id: input.id,
                     userId: ctx.auth.userId
                 }
-            }); 
+            });
 
             if (!existingProject) throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
 
             return existingProject;
         }),
-    getMany: protectedProcedure 
+    getMany: protectedProcedure
         .query(async ({ ctx }) => {
             const results = await prisma.project.findMany({
                 where: {
@@ -33,7 +34,7 @@ export const projectsRouter = createTRPCRouter({
                 orderBy: {
                     updatedAt: "desc"
                 }
-            }); 
+            });
 
             return results;
         }),
@@ -46,6 +47,20 @@ export const projectsRouter = createTRPCRouter({
             }),
         )
         .mutation(async ({ input, ctx }) => {
+            // also charge with one credit 
+            try {
+                await consumeCredits();
+            } catch (e) {
+                if (e instanceof Error) {
+                    throw new TRPCError({ code: "BAD_REQUEST", message: "Something went wrong" });
+                } else {
+                    throw new TRPCError({
+                        code: "TOO_MANY_REQUESTS",
+                        message: "You have run out of credits"
+                    })
+                }
+            }
+
             const createdProject = await prisma.project.create({
                 data: {
                     userId: ctx.auth.userId,
@@ -54,8 +69,8 @@ export const projectsRouter = createTRPCRouter({
                     }),
                     messages: {
                         create: {
-                            content: input.value, 
-                            role: "USER", 
+                            content: input.value,
+                            role: "USER",
                             type: "RESULT"
                         }
                     }
@@ -63,12 +78,12 @@ export const projectsRouter = createTRPCRouter({
             });
 
             await inngest.send({
-                name: "code-agent/run", 
+                name: "code-agent/run",
                 data: {
-                    value: input.value, 
+                    value: input.value,
                     projectId: createdProject.id,
                 }
-            }); 
+            });
 
             return createdProject;
         })

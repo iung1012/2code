@@ -31,12 +31,17 @@ export default function ProjectForm() {
             queryClient.invalidateQueries(
                 trpc.projects.getMany.queryOptions()
             );
+            queryClient.invalidateQueries(trpc.usage.status.queryOptions());
             router.push(`/projects/${data.id}`);
         },
         onError: (error) => {
             if (error.data?.code === "UNAUTHORIZED") {
                 router.push('/sign-in')
+            } else if (error.data?.code === "TOO_MANY_REQUESTS") {
+                router.push('/pricing');
             }
+
+
             toast.error(error.message);
         }
     }));
