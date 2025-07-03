@@ -62,3 +62,8 @@ export function convertFilesToTreeItems(
   const result = convertNode(tree);
   return Array.isArray(result) ? result : [result];
 }
+
+export function trimTaskSummary(str: string): string {
+  const regex = new RegExp(`^<task_summary>+|</task_summary>+$`, 'g'); 
+  return str.replace(regex, '');
+}

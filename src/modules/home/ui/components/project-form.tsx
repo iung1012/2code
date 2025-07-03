@@ -34,6 +34,9 @@ export default function ProjectForm() {
             router.push(`/projects/${data.id}`);
         },
         onError: (error) => {
+            if (error.data?.code === "UNAUTHORIZED") {
+                router.push('/sign-in')
+            }
             toast.error(error.message);
         }
     }));

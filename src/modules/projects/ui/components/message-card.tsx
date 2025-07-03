@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Fragment, MessageRole, MessageType } from "@/generated/prisma";
-import { cn } from "@/lib/utils";
+import { cn, trimTaskSummary } from "@/lib/utils";
 import { format } from "date-fns";
 import { ChevronRightIcon, Code2Icon } from "lucide-react";
 import Image from "next/image";
@@ -91,7 +91,7 @@ const AssistantMessage = ({
                 </span>
             </div>
             <div className="pl-8.5 flex flex-col gap-y-4">
-                <span>{content}</span>
+                <span>{trimTaskSummary(content)}</span>
                 {fragment && type === "RESULT" && (
                     <FragmentCard
                         fragment={fragment}
