@@ -14,7 +14,7 @@ export default function Usage({
     msBeforeNext
 }: Props) {
     const { has } = useAuth();
-    const hasProAccess = has?.({ plan: "pro" });
+    const hasProAccess = has?.({ plan: "pro" }) ?? false;
 
     return (
         <div className="rounded-t-xl bg-background border border-b-0 p-2.5">

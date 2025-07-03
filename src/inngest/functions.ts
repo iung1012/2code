@@ -5,8 +5,6 @@ import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 import { z } from "zod";
 import { PROMPT } from "@/prompt";
 import { prisma } from "@/lib/db";
-import { consumeCredits } from "@/lib/usage";
-import { TRPCError } from "@trpc/server";
 
 interface AgentState {
   summary: string,
