@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/nextjs";
 import { formatDuration, intervalToDuration } from "date-fns";
 import { CrownIcon } from "lucide-react";
 import Link from "next/link";
+import { useMemo } from "react";
 
 interface Props {
     points: number,
@@ -16,6 +17,20 @@ export default function Usage({
     const { has } = useAuth();
     const hasProAccess = has?.({ plan: "pro" }) ?? false;
 
+    const resetTime = useMemo(() => {
+        try {
+            return formatDuration(
+                intervalToDuration({
+                    start: new Date(), 
+                    end: new Date(Date.now() + msBeforeNext)
+                }), 
+                { format: ["months", "days", "hours" ]}
+            );
+        } catch (e) {
+            return "soon";
+        }
+    }, [msBeforeNext]);
+ 
     return (
         <div className="rounded-t-xl bg-background border border-b-0 p-2.5">
             <div className="flex items-center gap-x-2">
@@ -25,14 +40,7 @@ export default function Usage({
                     </p>
                     <p className="text-xs text-muted-foreground">
                         Resets in{" "}
-                        {formatDuration(intervalToDuration({
-                            start: new Date(),
-                            end: new Date(Date.now() + msBeforeNext)
-                        }),
-                            {
-                                format: ["months", "days", "hours"]
-                            }
-                        )}
+                        {resetTime}
                     </p>
                 </div>
                 {!hasProAccess &&
