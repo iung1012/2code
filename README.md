@@ -26,12 +26,21 @@
 
 <table>
   <tr>
-    <td><a href="https://youtu.be/NmBfgOanCyk" title="Video By Greer Viau"><img src="https://github.com/user-attachments/assets/db527dc3-7351-4ec4-96a3-e63e6af62b88"></a></td>
-    <td><a href="https://youtu.be/VHKyqZ7t8Gw" title="Video By Logan LeGrand"><img src="https://github.com/user-attachments/assets/f89294a5-a1a1-4829-92d1-8135cfeee453"></a></td>
+    <td><img src="https://github.com/user-attachments/assets/db527dc3-7351-4ec4-96a3-e63e6af62b88"></td>
+    <td><img src="https://github.com/user-attachments/assets/f89294a5-a1a1-4829-92d1-8135cfeee453"></td>
   </tr>
 </table>
 
 https://github.com/user-attachments/assets/b143a27c-db38-4696-bde2-13067d5930c1
 
-## Installation (soon)
+## Get started 
+### Prerequisites
+- git
+- recent version of NodeJS and NPM
+- E2B api key
+- Gemini API key
+- Neon URL
+- Clerk secrets (for billing)
+
+
 
