@@ -7,7 +7,7 @@ export const PROJECT_TEMPLATES = [
   },
   {
     emoji: "📦",
-    title: "Simple landing portfolio",
+    title: "Portfolio landing page",
     prompt:
       "Create a simple landing portfolio.",
   },
@@ -18,9 +18,9 @@ export const PROJECT_TEMPLATES = [
       "Create a simple tic-tac-toe game.",
   },
   {
-    emoji: "🎨",
-    title: "Draw with canvas",
-    prompt: "Create a simple drawing app using the HTML5 canvas.",
+    emoji: "🧠",
+    title: "Flashcard app",
+    prompt: "Create a flashcard quiz app for studying simple Q&A pairs.",
   },
   {
     emoji: "⏱️",
@@ -33,9 +33,9 @@ export const PROJECT_TEMPLATES = [
     prompt: "Create a simple calculator app",
   },
   {
-    emoji: "📝",
-    title: "Notes app",
-    prompt: "Create a simple note-taking app with save and delete features.",
+    emoji: "🔢",
+    title: "Number converter",
+    prompt: "Create a tool that converts numbers between binary, decimal, and hex.",
   },
   {
     emoji: "📅",
