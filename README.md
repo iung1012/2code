@@ -8,9 +8,7 @@
 </p>
 
 <h3>
-  <a href="https://neocode-one.vercel.app/">Demo</a>
-  <span> · </span>
-  <a href="https://x.com/tryneocode">Twitter</a>
+  <a href="https://neocode-one.vercel.app/">Live Demo</a>
 </h3>
 
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
