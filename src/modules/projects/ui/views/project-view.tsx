@@ -17,6 +17,8 @@ import Link from "next/link";
 import FileExplorer from "@/components/file-explorer";
 import UserControl from "@/components/user-control";
 import { useAuth } from "@clerk/nextjs";
+import ProjectHeaderSkeleton from "../components/project-header-skeleton";
+import MessageContainerSkeleton from "../components/message-container-skeleton";
 
 interface Props {
     projectId: string
@@ -37,10 +39,10 @@ export default function ProjectView({ projectId }: Props) {
                     minSize={20}
                     className="flex flex-col min-h-0"
                 >
-                    <Suspense fallback={<p>Loading project...</p>}>
+                    <Suspense fallback={<ProjectHeaderSkeleton />}>
                         <ProjectHeader projectId={projectId} />
                     </Suspense>
-                    <Suspense fallback={<p>Loading messages</p>}>
+                    <Suspense fallback={<MessageContainerSkeleton />}>
                         <MessagesContainer
                             projectId={projectId}
                             activeFragment={activeFragment}
