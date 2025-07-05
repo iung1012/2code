@@ -162,8 +162,10 @@ export const codeAgentFunction = inngest.createFunction(
             if (lastAssistantMessageText.includes("<task_summary>")) {
               network.state.data.summary = lastAssistantMessageText;
             }
+          } else if (network) {
+            network.state.data.summary = "The task was not generated successfully";
           }
-
+          
           return result;
         }
       }
@@ -174,10 +176,10 @@ export const codeAgentFunction = inngest.createFunction(
       agents: [codeAgent],
       defaultState: state,
       maxIter: 15,
-      router: async ({ network }) => {
-        const summary = network.state.data.summary;
-
-        if (summary) return;
+      router: async ({ lastResult }) => {
+        if (lastResult?.raw?.includes("<task_summary>")) {
+          return;
+        } // finish loop
         return codeAgent;
       }
     })
