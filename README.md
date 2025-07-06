@@ -29,13 +29,13 @@
   </tr>
 </table>
 
-https://github.com/user-attachments/assets/b143a27c-db38-4696-bde2-13067d5930c1
+https://github.com/user-attachments/assets/403225b6-0665-4dea-b33c-2f49552d5031
 
 ## Get started 
 ### Prerequisites
 - git
 - recent version of NodeJS and NPM
-- E2B api key
+- E2B
 - Gemini API key
 - Neon URL
 - Clerk secrets (for billing)
