@@ -22,7 +22,7 @@ export default function Page() {
           Build something with NeoCode
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground text-center">
-          Create your websites with a single prompt
+          Create your website with a single prompt
         </p>
         <div className="max-w-3xl mx-auto w-full">
           <ProjectForm />
