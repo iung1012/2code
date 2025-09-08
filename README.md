@@ -35,10 +35,10 @@ https://github.com/user-attachments/assets/403225b6-0665-4dea-b33c-2f49552d5031
 ### Prerequisites
 - git
 - recent version of NodeJS and NPM
+- Clerk account and API keys (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY)
 - E2B
 - Gemini API key
 - Neon URL
-- Clerk secrets (for billing)
 
 
 

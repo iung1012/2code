@@ -1,13 +1,12 @@
 import { auth } from '@clerk/nextjs/server';
 import { initTRPC, TRPCError } from '@trpc/server';
-import { cache } from 'react';
 import superjson from 'superjson';
-export const createTRPCContext = cache(async () => {
+export const createTRPCContext = async () => {
   /**
    * @see: https://trpc.io/docs/server/context
    */
   return { auth: await auth() };
-});
+};
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
